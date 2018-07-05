@@ -1,4 +1,6 @@
 //go:generate kallax gen
+//kallax migrate -i ./models/ -o ./migrations/ -n initial_schema
+//go:generate kallax migrate up -d ./migrations/ --dsn "vclog:w9QgaRDNDbkg2WsGli83Uoh2@vc-dev-db01.c1ugusbzuf2l.ap-southeast-1.rds.amazonaws.com:5432/vclog?sslmode=disable" -v 1530676411
 
 package models
 
