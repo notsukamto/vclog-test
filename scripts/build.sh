@@ -6,7 +6,7 @@ echo "Compiling functions to bin/handlers/ ..."
 
 rm -rf bin/
 
-cd src/handlers/
+cd handlers/
 for f in *.go; do
   filename="${f%.go}"
   if GOOS=linux go build -o "../../bin/handlers/$filename" ${f}; then
