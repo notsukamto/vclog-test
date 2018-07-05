@@ -9,7 +9,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/notsukamto/vclog-test/models"
+	"github.com/notsukamto/vclog-test/database"
 )
 
 // Response containing returned fields
@@ -31,12 +31,12 @@ func Handler(event events.CloudwatchLogsEvent) (Response, error) {
 		panic(err)
 	}
 
-	registrationPayload := &models.Registration{
+	registrationPayload := &database.Registration{
 		ID:       kallax.NewULID(),
 		SourceIP: payloadMap["identity"]["sourceIp"].(string),
 	}
 
-	AddRegistrationData(registrationPayload)
+	database.AddRegistrationData(registrationPayload)
 
 	return Response{Message: fmt.Sprintf("Your data is: %s", jsonStr)}, nil
 }
