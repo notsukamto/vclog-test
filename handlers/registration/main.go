@@ -19,21 +19,51 @@ type Response struct {
 
 // Handler of the lambda function
 func Handler(event events.CloudwatchLogsEvent) (Response, error) {
-	data, _ := event.AWSLogs.Parse()
-	logStr := data.LogEvents[0].Message
-	jsonStrIndex := strings.Index(logStr, "{")
-	jsonStrTemp := logStr[jsonStrIndex:]
-	jsonStr := strings.Replace(jsonStrTemp, `'`, `"`, -1)
-	payloadMap := make(map[string]map[string]interface{})
-
-	err := json.Unmarshal([]byte(jsonStr), &payloadMap)
+	data, err := event.AWSLogs.Parse()
 	if err != nil {
 		panic(err)
 	}
 
+	var jsonStr string
+	var registrationID kallax.ULID
+	var identityMap map[string]interface{}
+
+	for logs := range data.LogEvents {
+		logStr := data.LogEvents[logs].Message
+		if strings.Contains(logStr, "body") {
+			jsonStrIndex := strings.Index(logStr, "{")
+			jsonStrTemp := logStr[jsonStrIndex:]
+			jsonStr = strings.Replace(jsonStrTemp, `'`, `"`, -1)
+			payloadMap := make(map[string]interface{})
+
+			err := json.Unmarshal([]byte(jsonStr), &payloadMap)
+			if err != nil {
+				panic(err)
+			}
+
+			identityMap = payloadMap["identity"].(map[string]interface{})
+		} else if strings.Contains(logStr, "reference_id") {
+			jsonStrIndex := strings.Index(logStr, "{")
+			jsonStrTemp := logStr[jsonStrIndex:]
+			jsonStr := strings.Replace(jsonStrTemp, `'`, `"`, -1)
+			payloadMap := make(map[string]interface{})
+
+			err := json.Unmarshal([]byte(jsonStr), &payloadMap)
+			if err != nil {
+				panic(err)
+			}
+
+			registrationID, err = kallax.NewULIDFromText(fmt.Sprint(payloadMap["reference_id"]))
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
+
 	registrationPayload := &database.Registration{
-		ID:       kallax.NewULID(),
-		SourceIP: payloadMap["identity"]["sourceIp"].(string),
+		ID:       registrationID,
+		SourceIP: fmt.Sprint(identityMap["sourceIp"]),
 	}
 
 	database.AddRegistrationData(registrationPayload)
