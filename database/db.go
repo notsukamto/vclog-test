@@ -17,10 +17,10 @@ func envOrDefault(key string, def string) string {
 func dbURL() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s/%s?sslmode=disable",
-		envOrDefault("DBUSER", "vclog"),
-		envOrDefault("DBPASS", "w9QgaRDNDbkg2WsGli83Uoh2"),
-		envOrDefault("DBHOST", "vc-dev-db01.c1ugusbzuf2l.ap-southeast-1.rds.amazonaws.com"),
-		envOrDefault("DBNAME", "vclog"),
+		envOrDefault("DBUSER", "testing"),
+		envOrDefault("DBPASS", "testing"),
+		envOrDefault("DBHOST", "0.0.0.0:5432"),
+		envOrDefault("DBNAME", "testing"),
 	)
 }
 
