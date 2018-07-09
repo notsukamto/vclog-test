@@ -60,6 +60,13 @@ functions:
       - subscriptionFilter:
           stage: dev
           logGroupName: /aws/lambda/vids-idapi-v1-register
+          filterPattern: DEBUG
+  login:
+    handler: bin/login
+    events:
+      - subscriptionFilter:
+          stage: dev
+          logGroupName: /aws/lambda/vids-idapi-v1-login
           filterPattern: body
 
 #    The following are a few example events you can configure
@@ -110,3 +117,4 @@ functions:
 
 plugins:
   - serverless-plugin-subscription-filter
+  - serverless-kms-secrets
